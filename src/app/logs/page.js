@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/utils/supabaseClient";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ export default function LogsPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  // 🔥 ユーザー確認
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -29,26 +30,28 @@ export default function LogsPage() {
     checkUser();
   }, [router]);
 
-  if (loading) return <p>読み込み中...</p>;
+  // 🔥 fetchLogs を useCallback で安定化
+  const fetchLogs = useCallback(async () => {
+    if (!user) return;
 
-const fetchLogs = async () => {
-  if (!user) return; // ユーザーがまだ取得されてない場合は何もしない
+    const { data, error } = await supabase
+      .from("logs")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
-  const { data, error } = await supabase
-    .from("logs")
-    .select("*")
-    .eq("user_id", user.id) // 👈 ログイン中ユーザーの投稿だけ取得！
-    .order("created_at", { ascending: false });
+    if (error) console.error("Error fetching logs:", error);
+    else setLogs(data);
+  }, [user]);
 
-  if (error) console.error("Error fetching logs:", error);
-  else setLogs(data);
-};
-
+  // 🔥 ログ取得（依存関係に fetchLogs を入れる）
   useEffect(() => {
     fetchLogs();
-  }, []);
+  }, [fetchLogs]);
 
-  // ✅ 投稿処理
+  if (loading) return <p>読み込み中...</p>;
+
+  // 🔥 投稿処理
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -57,7 +60,7 @@ const fetchLogs = async () => {
       {
         title,
         content,
-        user_id: user.id, // ← ログイン中のユーザーを紐付ける！
+        user_id: user.id,
       },
     ]);
 
@@ -66,7 +69,7 @@ const fetchLogs = async () => {
     } else {
       setTitle("");
       setContent("");
-      fetchLogs(); // 投稿後にリスト更新
+      fetchLogs(); // 投稿後に更新
     }
   };
 
