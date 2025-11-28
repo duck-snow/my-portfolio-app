@@ -12,8 +12,15 @@ export default function LogsPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+
+  // 新規投稿フォーム
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  // 編集用
+  const [editingId, setEditingId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
 
   // 🔥 ユーザー確認
   useEffect(() => {
@@ -41,9 +48,12 @@ export default function LogsPage() {
       .order("created_at", { ascending: false });
 
     if (error) console.error("Error fetching logs:", error);
-    else setLogs(
-    data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    );
+    else
+      setLogs(
+        data.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        )
+      );
   }, [user]);
 
   // 🔥 ログ取得（依存関係に fetchLogs を入れる）
@@ -53,7 +63,7 @@ export default function LogsPage() {
 
   if (loading) return <p>読み込み中...</p>;
 
-  // 🔥 投稿処理
+  // 🔥 新規投稿
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -66,13 +76,36 @@ export default function LogsPage() {
       },
     ]);
 
-    if (error) {
-      console.error("Error adding log:", error);
-    } else {
+    if (error) console.error("Error adding log:", error);
+    else {
       setTitle("");
       setContent("");
-      fetchLogs(); // 投稿後に更新
+      fetchLogs(); // 投稿後更新
     }
+  };
+
+  // 🔥 削除処理
+  const handleDelete = async (id) => {
+    await supabase.from("logs").delete().eq("id", id);
+    fetchLogs();
+  };
+
+  // 🔥 編集開始
+  const startEdit = (log) => {
+    setEditingId(log.id);
+    setEditTitle(log.title);
+    setEditContent(log.content);
+  };
+
+  // 🔥 編集保存
+  const handleUpdate = async () => {
+    await supabase
+      .from("logs")
+      .update({ title: editTitle, content: editContent })
+      .eq("id", editingId);
+
+    setEditingId(null);
+    fetchLogs();
   };
 
   return (
@@ -119,11 +152,51 @@ export default function LogsPage() {
         <ul className="space-y-4">
           {logs.map((log) => (
             <li key={log.id} className="border p-3 rounded-md shadow-sm">
-              <h2 className="text-xl font-semibold">{log.title}</h2>
-              <p className="text-gray-700">{log.content}</p>
-              <p className="text-sm text-gray-500">
-                🕒 {new Date(log.created_at).toLocaleDateString()}
-              </p>
+              {/* 編集モード */}
+              {editingId === log.id ? (
+                <div className="space-y-2">
+                  <Input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
+                  <Textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                  />
+                  <div className="flex space-x-2">
+                    <Button onClick={handleUpdate}>保存</Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingId(null)}
+                    >
+                      キャンセル
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl font-semibold">{log.title}</h2>
+                  <p className="text-gray-700">{log.content}</p>
+                  <p className="text-sm text-gray-500">
+                    🕒 {new Date(log.created_at).toLocaleDateString()}
+                  </p>
+
+                  <div className="flex space-x-2 mt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => startEdit(log)}
+                    >
+                      編集
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDelete(log.id)}
+                    >
+                      削除
+                    </Button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>
