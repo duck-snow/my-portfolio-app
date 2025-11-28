@@ -41,7 +41,9 @@ export default function LogsPage() {
       .order("created_at", { ascending: false });
 
     if (error) console.error("Error fetching logs:", error);
-    else setLogs(data);
+    else setLogs(
+    data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    );
   }, [user]);
 
   // 🔥 ログ取得（依存関係に fetchLogs を入れる）
