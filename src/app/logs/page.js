@@ -62,7 +62,7 @@ export default function LogsPage() {
 
   if (loading) return <p>読み込み中...</p>;
 
-  // 新規投稿（JSバリデーションで統一）
+  // 新規投稿（required を使わず JS バリデーションへ統一）
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -106,7 +106,7 @@ export default function LogsPage() {
     setEditContent(log.content);
   };
 
-  // 編集保存（新規と同じバリデーションに統一）
+  // 編集保存（新規と同じバリデーションを適用）
   const handleUpdate = async () => {
     if (!editTitle.trim()) {
       alert("タイトルは必須です");
@@ -153,13 +153,11 @@ export default function LogsPage() {
           placeholder="タイトル"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          required
         />
         <Textarea
           placeholder="内容"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          required
         />
         <Button type="submit">投稿</Button>
       </form>
@@ -177,12 +175,10 @@ export default function LogsPage() {
                   <Input
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    required
                   />
                   <Textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    required
                   />
                   <div className="flex space-x-2">
                     <Button onClick={handleUpdate}>保存</Button>
@@ -195,7 +191,7 @@ export default function LogsPage() {
                   </div>
                 </div>
               ) : (
-                // 通常表示
+                // 表示モード
                 <>
                   <h2 className="text-xl font-semibold">{log.title}</h2>
                   <p className="text-gray-700">{log.content}</p>
