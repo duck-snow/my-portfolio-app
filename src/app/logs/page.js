@@ -22,7 +22,7 @@ export default function LogsPage() {
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
 
-  // 🔥 ユーザー確認
+  // ユーザー確認
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -37,7 +37,7 @@ export default function LogsPage() {
     checkUser();
   }, [router]);
 
-  // 🔥 fetchLogs を useCallback で安定化
+  // fetchLogs
   const fetchLogs = useCallback(async () => {
     if (!user) return;
 
@@ -56,17 +56,26 @@ export default function LogsPage() {
       );
   }, [user]);
 
-  // 🔥 ログ取得（依存関係に fetchLogs を入れる）
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
 
   if (loading) return <p>読み込み中...</p>;
 
-  // 🔥 新規投稿
+  // 新規投稿（JSバリデーションで統一）
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
+
+    if (!title.trim()) {
+      alert("タイトルは必須です");
+      return;
+    }
+
+    if (!content.trim()) {
+      alert("内容は必須です");
+      return;
+    }
 
     const { error } = await supabase.from("logs").insert([
       {
@@ -80,25 +89,35 @@ export default function LogsPage() {
     else {
       setTitle("");
       setContent("");
-      fetchLogs(); // 投稿後更新
+      fetchLogs();
     }
   };
 
-  // 🔥 削除処理
+  // 削除
   const handleDelete = async (id) => {
     await supabase.from("logs").delete().eq("id", id);
     fetchLogs();
   };
 
-  // 🔥 編集開始
+  // 編集開始
   const startEdit = (log) => {
     setEditingId(log.id);
     setEditTitle(log.title);
     setEditContent(log.content);
   };
 
-  // 🔥 編集保存
+  // 編集保存（新規と同じバリデーションに統一）
   const handleUpdate = async () => {
+    if (!editTitle.trim()) {
+      alert("タイトルは必須です");
+      return;
+    }
+
+    if (!editContent.trim()) {
+      alert("内容は必須です");
+      return;
+    }
+
     await supabase
       .from("logs")
       .update({ title: editTitle, content: editContent })
@@ -128,7 +147,7 @@ export default function LogsPage() {
         )}
       </div>
 
-      {/* 投稿フォーム */}
+      {/* 新規投稿フォーム */}
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <Input
           placeholder="タイトル"
@@ -152,16 +171,18 @@ export default function LogsPage() {
         <ul className="space-y-4">
           {logs.map((log) => (
             <li key={log.id} className="border p-3 rounded-md shadow-sm">
-              {/* 編集モード */}
               {editingId === log.id ? (
+                // 編集モード
                 <div className="space-y-2">
                   <Input
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
+                    required
                   />
                   <Textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
+                    required
                   />
                   <div className="flex space-x-2">
                     <Button onClick={handleUpdate}>保存</Button>
@@ -174,6 +195,7 @@ export default function LogsPage() {
                   </div>
                 </div>
               ) : (
+                // 通常表示
                 <>
                   <h2 className="text-xl font-semibold">{log.title}</h2>
                   <p className="text-gray-700">{log.content}</p>
