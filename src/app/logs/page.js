@@ -95,6 +95,9 @@ export default function LogsPage() {
 
   // 削除
   const handleDelete = async (id) => {
+    const ok = window.confirm("このログを本当に削除しますか？")
+    if (!ok) return;
+  
     await supabase.from("logs").delete().eq("id", id);
     fetchLogs();
   };
