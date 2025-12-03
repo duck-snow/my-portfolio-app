@@ -27,22 +27,21 @@ export default function LoginPage() {
     if (error) {
       setError(error.message)
     } else {
-      console.log("ログイン成功:", data)
-      router.push("/logs") // ✅ ログイン成功で /logs にリダイレクト！
+      router.push("/logs")
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <form
         onSubmit={handleLogin}
-        className="space-y-6 bg-gray-100 p-8 rounded-md shadow-md w-full max-w-md"
+        className="w-full max-w-md bg-white p-8 rounded-lg shadow-md space-y-6"
       >
-        <h1 className="text-2xl font-bold text-center">ログイン</h1>
+        <h1 className="text-2xl font-semibold text-center">ログイン</h1>
 
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="email">メールアドレス</Label>
           <Input
             id="email"
@@ -50,10 +49,11 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
           />
         </div>
 
-        <div>
+        <div className="space-y-1">
           <Label htmlFor="password">パスワード</Label>
           <Input
             id="password"
@@ -61,20 +61,25 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
           />
         </div>
 
         {error && (
-          <p className="text-red-500 text-sm text-center">{error}</p>
+          <p className="text-red-500 text-sm text-center mt-1">{error}</p>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full disabled:opacity-70 disabled:cursor-not-allowed"
+        >
           {loading ? "ログイン中..." : "ログイン"}
         </Button>
 
         <p className="text-center text-sm">
           アカウントをお持ちでない方は{" "}
-          <a href="/signup" className="text-blue-500 hover:underline">
+          <a href="/signup" className="text-blue-600 hover:underline">
             サインアップへ
           </a>
         </p>

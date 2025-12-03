@@ -47,35 +47,29 @@ export default function LogsPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (error) console.error("Error fetching logs:", error);
-    else
-      setLogs(
-        data.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        )
-      );
+    if (!error) {
+      setLogs(data);
+    }
   }, [user]);
 
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
 
-  if (loading) return <p>読み込み中...</p>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">読み込み中...</p>
+      </div>
+    );
 
-  // 新規投稿（required を使わず JS バリデーションへ統一）
+  // 新規投稿
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
 
-    if (!title.trim()) {
-      alert("タイトルは必須です");
-      return;
-    }
-
-    if (!content.trim()) {
-      alert("内容は必須です");
-      return;
-    }
+    if (!title.trim()) return alert("タイトルは必須です");
+    if (!content.trim()) return alert("内容は必須です");
 
     const { error } = await supabase.from("logs").insert([
       {
@@ -85,8 +79,7 @@ export default function LogsPage() {
       },
     ]);
 
-    if (error) console.error("Error adding log:", error);
-    else {
+    if (!error) {
       setTitle("");
       setContent("");
       fetchLogs();
@@ -95,9 +88,8 @@ export default function LogsPage() {
 
   // 削除
   const handleDelete = async (id) => {
-    const ok = window.confirm("このログを本当に削除しますか？")
-    if (!ok) return;
-  
+    if (!window.confirm("このログを本当に削除しますか？")) return;
+
     await supabase.from("logs").delete().eq("id", id);
     fetchLogs();
   };
@@ -109,17 +101,10 @@ export default function LogsPage() {
     setEditContent(log.content);
   };
 
-  // 編集保存（新規と同じバリデーションを適用）
+  // 編集保存
   const handleUpdate = async () => {
-    if (!editTitle.trim()) {
-      alert("タイトルは必須です");
-      return;
-    }
-
-    if (!editContent.trim()) {
-      alert("内容は必須です");
-      return;
-    }
+    if (!editTitle.trim()) return alert("タイトルは必須です");
+    if (!editContent.trim()) return alert("内容は必須です");
 
     await supabase
       .from("logs")
@@ -131,12 +116,15 @@ export default function LogsPage() {
   };
 
   return (
-    <main className="p-6 max-w-2xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">📚 学習ログ一覧</h1>
-        {user && (
+    <main className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-3xl mx-auto space-y-8">
+
+        {/* ヘッダー */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">📚 学習ログ一覧</h1>
+
           <div className="flex items-center space-x-4">
-            <p className="text-sm text-gray-600">{user.email}</p>
+            <p className="text-sm text-gray-600">{user?.email}</p>
             <Button
               variant="outline"
               onClick={async () => {
@@ -147,81 +135,90 @@ export default function LogsPage() {
               ログアウト
             </Button>
           </div>
+        </div>
+
+        {/* 新規投稿カード */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 rounded-lg shadow-md space-y-4"
+        >
+          <Input
+            placeholder="タイトル"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+          />
+          <Textarea
+            placeholder="内容"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+          />
+          <Button type="submit" className="w-full">
+            投稿
+          </Button>
+        </form>
+
+        {/* 投稿一覧 */}
+        {logs.length === 0 ? (
+          <p className="text-gray-600">まだログがありません。</p>
+        ) : (
+          <ul className="space-y-4">
+            {logs.map((log) => (
+              <li
+                key={log.id}
+                className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm"
+              >
+                {editingId === log.id ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+                    />
+                    <Textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+                    />
+                    <div className="flex space-x-2">
+                      <Button onClick={handleUpdate}>保存</Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditingId(null)}
+                      >
+                        キャンセル
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-semibold">{log.title}</h2>
+                    <p className="text-gray-700 whitespace-pre-line">{log.content}</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      🕒 {new Date(log.created_at).toLocaleDateString()}
+                    </p>
+                    <div className="flex space-x-2 mt-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => startEdit(log)}
+                      >
+                        編集
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDelete(log.id)}
+                      >
+                        削除
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
-
-      {/* 新規投稿フォーム */}
-      <form onSubmit={handleSubmit} className="space-y-4 mb-8">
-        <Input
-          placeholder="タイトル"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <Textarea
-          placeholder="内容"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-        <Button type="submit">投稿</Button>
-      </form>
-
-      {/* 投稿一覧 */}
-      {logs.length === 0 ? (
-        <p>まだログがありません。</p>
-      ) : (
-        <ul className="space-y-4">
-          {logs.map((log) => (
-            <li key={log.id} className="border p-3 rounded-md shadow-sm">
-              {editingId === log.id ? (
-                // 編集モード
-                <div className="space-y-2">
-                  <Input
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                  />
-                  <Textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                  />
-                  <div className="flex space-x-2">
-                    <Button onClick={handleUpdate}>保存</Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setEditingId(null)}
-                    >
-                      キャンセル
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                // 表示モード
-                <>
-                  <h2 className="text-xl font-semibold">{log.title}</h2>
-                  <p className="text-gray-700">{log.content}</p>
-                  <p className="text-sm text-gray-500">
-                    🕒 {new Date(log.created_at).toLocaleDateString()}
-                  </p>
-
-                  <div className="flex space-x-2 mt-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => startEdit(log)}
-                    >
-                      編集
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(log.id)}
-                    >
-                      削除
-                    </Button>
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
     </main>
   );
 }
