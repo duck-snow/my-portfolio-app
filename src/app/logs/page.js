@@ -53,8 +53,10 @@ export default function LogsPage() {
   }, [user]);
 
   useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
+    if (user) {
+      fetchLogs();
+    }
+  }, [user, fetchLogs]);
 
   if (loading)
     return (
