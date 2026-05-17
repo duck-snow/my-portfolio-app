@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import Link from 'next/link'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -76,9 +77,9 @@ export default function SignupPage() {
 
         <p className="text-center text-sm mt-2">
           すでにアカウントをお持ちですか？{' '}
-          <a href="/login" className="text-blue-600 hover:underline">
+          <Link href="/login" className="text-blue-600 hover:underline">
             ログイン
-          </a>
+          </Link>
         </p>
       </form>
     </div>
