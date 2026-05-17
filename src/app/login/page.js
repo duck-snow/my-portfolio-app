@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import Link from "next/link"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -79,9 +80,9 @@ export default function LoginPage() {
 
         <p className="text-center text-sm">
           アカウントをお持ちでない方は{" "}
-          <a href="/signup" className="text-blue-600 hover:underline">
+          <Link href="/signup" className="text-blue-600 hover:underline">
             サインアップへ
-          </a>
+          </Link>
         </p>
       </form>
     </div>
