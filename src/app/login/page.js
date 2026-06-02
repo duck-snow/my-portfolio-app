@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { Input } from "@/components/ui/input"
@@ -33,6 +33,18 @@ export default function LoginPage() {
 
     setLoading(false)
   }
+
+  // URLのハッシュを削除し、セッションをクリア
+  useEffect(() => {
+    const hasAccessToken = window.location.hash.includes('access_token');
+    const endsWithHash = window.location.href.endsWith('#');
+
+    if (hasAccessToken || endsWithHash) {
+      supabase.auth.signOut();
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      alert('メール認証が完了しました。ログインしてください。')
+    }
+  }, [])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
