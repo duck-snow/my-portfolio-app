@@ -42,7 +42,6 @@ export default function LoginPage() {
     if (hasAccessToken || endsWithHash) {
       supabase.auth.signOut();
       window.history.replaceState(null, "", window.location.pathname + window.location.search);
-      alert('メール認証が完了しました。ログインしてください。')
     }
   }, [])
 
