@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import Link from 'next/link'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -34,7 +35,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <form
         onSubmit={handleSignup}
         className="w-full max-w-md bg-white p-8 rounded-lg shadow-md space-y-4"
@@ -47,26 +48,38 @@ export default function SignupPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
         />
+
         <Input
           type="password"
           placeholder="パスワード（6文字以上）"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
         />
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {/* エラーが出た時に少し余白調整 */}
+        {error && (
+          <p className="text-red-500 text-sm mt-1">
+            {error}
+          </p>
+        )}
 
-        <Button type="submit" disabled={loading} className="w-full">
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full disabled:opacity-70 disabled:cursor-not-allowed"
+        >
           {loading ? '登録中...' : 'アカウント作成'}
         </Button>
 
         <p className="text-center text-sm mt-2">
           すでにアカウントをお持ちですか？{' '}
-          <a href="/login" className="text-blue-500 hover:underline">
+          <Link href="/login" className="text-blue-600 hover:underline">
             ログイン
-          </a>
+          </Link>
         </p>
       </form>
     </div>
