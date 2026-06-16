@@ -3,7 +3,7 @@
 Next.js と Supabase を使用して開発した、シンプルな学習記録アプリケーションです。
 
 ## 💡 デプロイURL
-[アプリにアクセスする](https://my-portfolio-d4b9ltem7-duck-snows-projects.vercel.app/login)
+[アプリにアクセスする](https://my-portfolio-app-psi-pied.vercel.app/logs)
 ※テスト用アカウント：user@example.com / パスワード: test
 
 ## 🚀 開発背景
