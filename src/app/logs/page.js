@@ -60,7 +60,7 @@ export default function LogsPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-300">
         <p className="text-gray-600">読み込み中...</p>
       </div>
     );
@@ -118,12 +118,17 @@ export default function LogsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
+    <main className="min-h-screen bg-slate-300 p-6">
       <div className="max-w-3xl mx-auto space-y-8">
 
         {/* ヘッダー */}
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">📚 学習ログ一覧</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800">学習ログ一覧</h1>
+            <p className="text-xs font-medium text-center text-gray-500 uppercase tracking-widest mt-2">
+              Study Log Dashboard
+            </p>
+          </div>
 
           <div className="flex items-center space-x-4">
             <p className="text-sm text-gray-600">{user?.email}</p>
@@ -142,19 +147,19 @@ export default function LogsPage() {
         {/* 新規投稿カード */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-lg shadow-md space-y-4"
+          className="bg-slate-500 p-6 rounded-lg shadow-md space-y-4"
         >
           <Input
             placeholder="タイトル"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-gray-200"
           />
           <Textarea
             placeholder="内容"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-gray-200"
           />
           <Button type="submit" className="w-full">
             投稿
@@ -163,13 +168,13 @@ export default function LogsPage() {
 
         {/* 投稿一覧 */}
         {logs.length === 0 ? (
-          <p className="text-gray-600">まだログがありません。</p>
+          <p className="text-gray-700">まだログがありません。</p>
         ) : (
           <ul className="space-y-4">
             {logs.map((log) => (
               <li
                 key={log.id}
-                className="bg-white border border-gray-200 p-4 rounded-lg shadow-sm"
+                className="bg-gray-100 border border-gray-300 p-4 rounded-lg shadow-sm"
               >
                 {editingId === log.id ? (
                   <div className="space-y-2">
@@ -208,7 +213,8 @@ export default function LogsPage() {
                         編集
                       </Button>
                       <Button
-                        variant="destructive"
+                        className="bg-gray-700 text-white hover:bg-gray-600 hover:text-gray-50"
+                        variant="outline"
                         onClick={() => handleDelete(log.id)}
                       >
                         削除

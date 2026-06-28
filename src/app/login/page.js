@@ -46,10 +46,19 @@ export default function LoginPage() {
   }, [])
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-300">
+      <div className="w-full max-w-md mb-15">
+        <h1 className="text-3xl font-extrabold text-center text-slate-800">
+          学習ログアプリ
+        </h1>
+        <p className="text-xs font-medium text-center text-gray-500 uppercase tracking-widest mt-2">
+          Study Log Dashboard
+        </p>
+      </div>
+
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-md bg-white p-8 rounded-lg shadow-md space-y-6"
+        className="w-full max-w-md bg-slate-50 p-8 rounded-lg shadow-md space-y-4"
       >
         <h1 className="text-2xl font-semibold text-center">ログイン</h1>
 
@@ -61,7 +70,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:border-slate-400"
           />
         </div>
 
@@ -73,7 +82,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500"
+            className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:border-slate-400"
           />
         </div>
 
@@ -84,14 +93,14 @@ export default function LoginPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full disabled:opacity-70 disabled:cursor-not-allowed"
+        className="w-full disabled:opacity-70 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:border-slate-400"
         >
           {loading ? "ログイン中..." : "ログイン"}
         </Button>
 
         <p className="text-center text-sm">
           アカウントをお持ちでない方は{" "}
-          <Link href="/signup" className="text-blue-600 hover:underline">
+          <Link href="/signup" className="text-blue-500 hover:underline">
             サインアップへ
           </Link>
         </p>
