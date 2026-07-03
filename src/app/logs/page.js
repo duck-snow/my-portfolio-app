@@ -70,9 +70,6 @@ export default function LogsPage() {
     e.preventDefault();
     if (!user) return;
 
-    if (!title.trim()) return alert("タイトルは必須です");
-    if (!content.trim()) return alert("内容は必須です");
-
     const { error } = await supabase.from("logs").insert([
       {
         title,
@@ -104,9 +101,8 @@ export default function LogsPage() {
   };
 
   // 編集保存
-  const handleUpdate = async () => {
-    if (!editTitle.trim()) return alert("タイトルは必須です");
-    if (!editContent.trim()) return alert("内容は必須です");
+  const handleUpdate = async (e) => {
+  if (e) e.preventDefault();
 
     await supabase
       .from("logs")
@@ -154,12 +150,14 @@ export default function LogsPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-gray-200"
+            required
           />
           <Textarea
             placeholder="内容"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-gray-200"
+            required
           />
           <Button type="submit" className="w-full">
             投稿
@@ -177,19 +175,21 @@ export default function LogsPage() {
                 className="bg-gray-100 border border-gray-300 p-4 rounded-lg shadow-sm"
               >
                 {editingId === log.id ? (
-                  <div className="space-y-2">
+                  <form onSubmit={handleUpdate} className="space-y-2">
                     <Input
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+                      required
                     />
                     <Textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
                       className="bg-white border border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500"
+                      required
                     />
                     <div className="flex space-x-2">
-                      <Button onClick={handleUpdate}>保存</Button>
+                      <Button>保存</Button>
                       <Button
                         variant="outline"
                         onClick={() => setEditingId(null)}
@@ -197,7 +197,7 @@ export default function LogsPage() {
                         キャンセル
                       </Button>
                     </div>
-                  </div>
+                  </form>
                 ) : (
                   <>
                     <h2 className="text-xl font-semibold">{log.title}</h2>
