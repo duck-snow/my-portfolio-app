@@ -36,14 +36,12 @@ const buttonVariants = cva(
   }
 )
 
-// ▼ ここでButtonが受け取るPropsの型を定義しています
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
-// ▼ 引数に : ButtonProps を追加
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
